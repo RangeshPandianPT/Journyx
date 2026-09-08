@@ -12,6 +12,9 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 
 import { Navbar } from "../components/Navbar";
+import { MobileBottomNav } from "../components/MobileBottomNav";
+import { useNativeMobile } from "../hooks/useNativeMobile";
+
 
 function NotFoundComponent() {
   return (
@@ -77,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "Journyx Transport" },
       { name: "description", content: "Professional Transport Booking Platform" },
       { name: "author", content: "Journyx" },
@@ -117,12 +120,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  useNativeMobile();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Navbar />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="flex min-h-screen flex-col pb-16 md:pb-0 bg-background text-foreground">
+        <Navbar />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <MobileBottomNav />
+      </div>
     </QueryClientProvider>
   );
 }

@@ -15,7 +15,7 @@ export function Navbar() {
               Journyx
             </span>
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium"> 
             <Link
               to="/"
               className="text-muted-foreground transition-colors hover:text-primary [&.active]:text-foreground [&.active]:font-semibold"
