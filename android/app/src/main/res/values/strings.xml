@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Journyx</string>
+    <string name="title_activity_main">Journyx</string>
+    <string name="package_name">com.rangesh.journyx</string>
+    <string name="custom_url_scheme">com.rangesh.journyx</string>
+</resources>
