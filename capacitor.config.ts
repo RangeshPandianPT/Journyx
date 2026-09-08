@@ -3,7 +3,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.rangesh.journyx',
   appName: 'Journyx',
-  webDir: '.output/public',
+  webDir: 'dist',
   server: {
     androidScheme: 'https'
   },

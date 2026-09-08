@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "build:dev": "vite build --mode development",
-    "build:mobile": "vite build && node scripts/prepare-mobile-build.js && npx cap sync android",
+    "build:mobile": "vite build --config vite.config.mobile.ts && npx cap sync android",
     "cap:sync": "npx cap sync",
     "cap:copy": "npx cap copy",
     "cap:open": "npx cap open android",
