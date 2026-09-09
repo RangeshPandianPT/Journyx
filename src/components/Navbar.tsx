@@ -24,7 +24,7 @@ export function Navbar() {
             </Link>
             <Link
               to="/search"
-              search={{ from: "", to: "", date: "" }}
+              search={{ from: "", to: "", date: "", passengers: 1 }}
               className="text-muted-foreground transition-colors hover:text-primary [&.active]:text-foreground [&.active]:font-semibold"
             >
               Search

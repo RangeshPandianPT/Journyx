@@ -14,7 +14,7 @@ export function MobileBottomNav() {
     {
       label: "Search",
       to: "/search",
-      search: { from: "", to: "", date: "" },
+      search: { from: "", to: "", date: "", passengers: 1 },
       icon: Search,
       isActive: location.pathname === "/search",
     },
