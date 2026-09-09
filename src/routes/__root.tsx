@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -121,6 +122,14 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   useNativeMobile();
+
+  // Scroll to top on every route change — critical for mobile UX.
+  // Without this, the user sees a blank section of the previous page
+  // and thinks the app has frozen.
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location.pathname, location.hash]);
 
   return (
     <QueryClientProvider client={queryClient}>
