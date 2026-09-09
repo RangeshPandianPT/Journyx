@@ -11,9 +11,11 @@ export const getRouter = () => {
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    scrollRestoration: true,
+    // Disable scrollRestoration on native — it conflicts with hash history
+    // in Capacitor WebView and can cause the app to freeze/stop responding.
+    ...(isNative ? {} : { scrollRestoration: true }),
     defaultPreloadStaleTime: 0,
-    history: isNative ? createHashHistory() : undefined,
+    ...(isNative ? { history: createHashHistory() } : {}),
   });
 
   return router;
