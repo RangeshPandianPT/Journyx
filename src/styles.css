@@ -123,6 +123,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
+    /* Prevent overscroll bounce which can make the app feel frozen on mobile */
+    overscroll-behavior: none;
   }
 
   h1,
@@ -161,6 +163,33 @@
     oklch(0.86 0.008 84) 0 3px,
     oklch(0.92 0.006 84) 3px 6px
   );
+}
+
+/* ── Mobile / Capacitor Fixes ──────────────────────────────────────────────
+   1. touch-manipulation eliminates the ~300ms tap delay on Android WebView.
+      Without this, buttons feel unresponsive and users tap multiple times,
+      sometimes triggering wrong actions.
+   2. -webkit-tap-highlight-color removes the grey flash on tap.
+   3. safe-area-bottom adds padding for phones with home indicators.
+   4. The date input color-scheme ensures the native picker uses light mode.
+*/
+button,
+a,
+input,
+select,
+textarea,
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@utility safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Force light-mode calendar picker on mobile */
+input[type="date"] {
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {
