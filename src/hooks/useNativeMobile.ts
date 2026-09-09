@@ -20,11 +20,12 @@ export function useNativeMobile() {
 
     // 3. Handle Android Native Back Button
     const backButtonListener = App.addListener("backButton", ({ canGoBack }) => {
-      const currentPath = window.location.pathname;
+      const currentPath = window.location.pathname + window.location.hash;
 
-      if (currentPath !== "/" && canGoBack) {
-        window.history.back();
-      } else if (currentPath !== "/") {
+      if (canGoBack && currentPath !== "/" && currentPath !== "/#/") {
+        // Use router's history so TanStack Router state stays in sync
+        router.history.back();
+      } else if (currentPath !== "/" && currentPath !== "/#/") {
         router.navigate({ to: "/" });
       } else {
         App.exitApp();
