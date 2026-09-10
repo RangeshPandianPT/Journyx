@@ -52,6 +52,7 @@ function BookingFlow() {
   const [passengerPhone, setPassengerPhone] = useState(bookingState.passengerPhone);
   const [passengerEmail, setPassengerEmail] = useState(bookingState.passengerEmail);
   const [gender, setGender] = useState(bookingState.gender);
+  const [validationError, setValidationError] = useState("");
 
   // Persist to module-level so values survive remounts
   useEffect(() => {
@@ -109,12 +110,19 @@ function BookingFlow() {
 
   const proceedToReview = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passengerName && passengerAge && passengerEmail) {
-      navigate({
-        from: Route.fullPath,
-        search: { step: "review" as BookingStep, bookingId: undefined },
-      });
+    handleContinueToReview();
+  };
+
+  const handleContinueToReview = () => {
+    if (!passengerName || !passengerAge || !passengerPhone || !passengerEmail) {
+      setValidationError("Please fill in all required fields.");
+      return;
     }
+    setValidationError("");
+    navigate({
+      from: Route.fullPath,
+      search: { step: "review" as BookingStep, bookingId: undefined },
+    });
   };
 
   const completeBooking = () => {
@@ -384,16 +392,18 @@ function BookingFlow() {
                 </p>
               </CardHeader>
               <CardContent>
-                <form onSubmit={proceedToReview} className="space-y-5">
+                <div className="space-y-5">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <Input
                       id="name"
-                      required
+                      type="text"
+                      inputMode="text"
                       value={passengerName}
                       onChange={(e) => setPassengerName(e.target.value)}
+                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                       placeholder="Enter full name"
-                      autoComplete="name"
+                      autoComplete="off"
                       className="h-12 text-base"
                     />
                   </div>
@@ -404,12 +414,14 @@ function BookingFlow() {
                       <Input
                         id="age"
                         type="number"
-                        required
+                        inputMode="numeric"
                         min={1}
                         max={120}
                         value={passengerAge}
                         onChange={(e) => setPassengerAge(e.target.value)}
+                        onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                         placeholder="Age"
+                        autoComplete="off"
                         className="h-12 text-base"
                       />
                     </div>
@@ -419,7 +431,7 @@ function BookingFlow() {
                         id="gender"
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
-                        className="flex h-12 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        className="flex h-12 w-full rounded-md border border-input bg-background px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                       >
                         <option>Male</option>
                         <option>Female</option>
@@ -433,11 +445,12 @@ function BookingFlow() {
                     <Input
                       id="phone"
                       type="tel"
-                      required
+                      inputMode="tel"
                       value={passengerPhone}
                       onChange={(e) => setPassengerPhone(e.target.value)}
+                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                       placeholder="+91 9876543210"
-                      autoComplete="tel"
+                      autoComplete="off"
                       className="h-12 text-base"
                     />
                   </div>
@@ -447,22 +460,28 @@ function BookingFlow() {
                     <Input
                       id="email"
                       type="email"
-                      required
+                      inputMode="email"
                       value={passengerEmail}
                       onChange={(e) => setPassengerEmail(e.target.value)}
+                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                       placeholder="you@example.com"
-                      autoComplete="email"
+                      autoComplete="off"
                       className="h-12 text-base"
                     />
                   </div>
 
+                  {validationError && (
+                    <p className="text-sm text-destructive font-medium text-center">{validationError}</p>
+                  )}
+
                   <Button
-                    type="submit"
+                    type="button"
                     className="w-full h-12 text-base active:scale-[0.98] transition-all"
+                    onClick={handleContinueToReview}
                   >
                     Continue to Review
                   </Button>
-                </form>
+                </div>
               </CardContent>
             </Card>
           </div>
