@@ -133,7 +133,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-screen flex-col pb-16 md:pb-0 bg-background text-foreground">
+      <div className="flex min-h-[100dvh] flex-col pb-16 md:pb-0 bg-background text-foreground">
         <Navbar />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <main className="flex-1">
