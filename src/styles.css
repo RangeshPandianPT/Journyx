@@ -66,6 +66,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.5rem;
   --background: oklch(0.982 0.006 84);
   --foreground: oklch(0.245 0.014 250);
@@ -179,8 +180,9 @@ a,
 }
 
 input, select, textarea {
-  user-select: auto;
-  -webkit-user-select: auto;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  pointer-events: auto !important;
 }
 
 @utility safe-area-bottom {
