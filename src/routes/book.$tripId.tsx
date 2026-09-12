@@ -198,7 +198,7 @@ function BookingFlow() {
       <div className="container-page mt-6 max-w-4xl">
         {/* ── Step 1: Seat Selection ──────────────────────────────────────── */}
         {step === "seats" && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="max-w-2xl mx-auto md:max-w-4xl">
             <Button
               variant="ghost"
               className="mb-4"
@@ -370,7 +370,7 @@ function BookingFlow() {
 
         {/* ── Step 2: Passenger Details ───────────────────────────────────── */}
         {step === "passenger" && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             <Button
               variant="ghost"
               className="mb-4"
@@ -392,7 +392,7 @@ function BookingFlow() {
                 </p>
               </CardHeader>
               <CardContent>
-                <div className="space-y-5">
+                <form className="space-y-5" onSubmit={proceedToReview}>
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name</Label>
                     <Input
@@ -471,13 +471,12 @@ function BookingFlow() {
                   )}
 
                   <Button
-                    type="button"
+                    type="submit"
                     className="w-full h-12 text-base active:scale-[0.98] transition-all"
-                    onClick={handleContinueToReview}
                   >
                     Continue to Review
                   </Button>
-                </div>
+                </form>
               </CardContent>
             </Card>
           </div>
@@ -485,7 +484,7 @@ function BookingFlow() {
 
         {/* ── Step 3: Review ──────────────────────────────────────────────── */}
         {step === "review" && (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             <Button
               variant="ghost"
               className="mb-4"
@@ -577,7 +576,7 @@ function BookingFlow() {
 
         {/* ── Step 4: Confirmation ────────────────────────────────────────── */}
         {step === "confirmation" && (
-          <div className="animate-in zoom-in-95 duration-500 max-w-xl mx-auto text-center mt-8">
+          <div className="max-w-xl mx-auto text-center mt-8">
             <div className="h-20 w-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-soft">
               <CheckCircle2 className="h-10 w-10" />
             </div>
