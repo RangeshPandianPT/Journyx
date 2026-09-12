@@ -401,7 +401,6 @@ function BookingFlow() {
                       inputMode="text"
                       value={passengerName}
                       onChange={(e) => setPassengerName(e.target.value)}
-                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                       placeholder="Enter full name"
                       autoComplete="off"
                       className="h-12 text-base"
@@ -419,7 +418,6 @@ function BookingFlow() {
                         max={120}
                         value={passengerAge}
                         onChange={(e) => setPassengerAge(e.target.value)}
-                        onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                         placeholder="Age"
                         autoComplete="off"
                         className="h-12 text-base"
@@ -448,7 +446,6 @@ function BookingFlow() {
                       inputMode="tel"
                       value={passengerPhone}
                       onChange={(e) => setPassengerPhone(e.target.value)}
-                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                       placeholder="+91 9876543210"
                       autoComplete="off"
                       className="h-12 text-base"
@@ -463,7 +460,6 @@ function BookingFlow() {
                       inputMode="email"
                       value={passengerEmail}
                       onChange={(e) => setPassengerEmail(e.target.value)}
-                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ behavior: "smooth", block: "center" }), 300)}
                       placeholder="you@example.com"
                       autoComplete="off"
                       className="h-12 text-base"
