@@ -15,7 +15,7 @@ import appCss from "../styles.css?url";
 import { Navbar } from "../components/Navbar";
 import { MobileBottomNav } from "../components/MobileBottomNav";
 import { useNativeMobile } from "../hooks/useNativeMobile";
-
+import { Toaster } from "../components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -128,7 +128,7 @@ function RootComponent() {
   // and thinks the app has frozen.
   const location = useLocation();
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    window.scrollTo(0, 0);
   }, [location.pathname, location.hash]);
 
   return (
@@ -141,6 +141,7 @@ function RootComponent() {
         </main>
         <MobileBottomNav />
       </div>
+      <Toaster />
     </QueryClientProvider>
   );
 }
