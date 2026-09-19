@@ -183,6 +183,22 @@ input, select, textarea {
   -webkit-user-select: text !important;
   user-select: text !important;
   pointer-events: auto !important;
+  /* Prevent iOS zoom on focus — font size must be >= 16px */
+  font-size: 16px !important;
+  /* Ensure inputs are tappable in Android WebView */
+  touch-action: auto !important;
+  -webkit-tap-highlight-color: transparent;
+  /* Prevent the WebView from stealing focus */
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure relative containers for inputs don't block touch */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  z-index: 10;
 }
 
 @utility safe-area-bottom {
