@@ -118,7 +118,7 @@ function BookingCard({ booking }: { booking: any }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-border">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 pt-4 border-t border-border">
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Date</p>
                 <p className="font-medium">{booking.date}</p>
@@ -126,6 +126,10 @@ function BookingCard({ booking }: { booking: any }) {
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Booking ID</p>
                 <p className="font-medium">{booking.id}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Passenger</p>
+                <p className="font-medium">{booking.passengerName || "N/A"}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Seats</p>
