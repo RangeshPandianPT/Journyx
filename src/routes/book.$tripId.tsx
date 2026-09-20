@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { getTripById } from "@/lib/mockData";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   ChevronLeft,
@@ -53,13 +52,6 @@ function BookingFlow() {
   const trip = getTripById(tripId);
 
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
-  const [passengerName, setPassengerName] = useState("");
-  const [passengerAge, setPassengerAge] = useState("");
-  const [passengerPhone, setPassengerPhone] = useState("");
-  const [passengerEmail, setPassengerEmail] = useState("");
-  const [gender, setGender] = useState("Male");
-  const [validationError, setValidationError] = useState("");
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -97,42 +89,9 @@ function BookingFlow() {
     );
   };
 
-  const proceedToBooking = () => {
-    if (selectedSeats.length > 0) {
-      navigate({
-        from: Route.fullPath,
-        search: { step: "booking" as BookingStep, bookingId: undefined },
-      });
-    }
-  };
+  const completeBooking = (e?: any) => {
+    if (e && e.preventDefault) e.preventDefault();
 
-  const completeBooking = (e?: React.FormEvent<HTMLFormElement>) => {
-    if (e) e.preventDefault();
-
-    if (!passengerName.trim()) {
-      setValidationError("Please enter the passenger's full name.");
-      return;
-    }
-
-    const ageNum = parseInt(passengerAge, 10);
-    if (isNaN(ageNum) || ageNum < 1 || ageNum > 120) {
-      setValidationError("Please enter a valid age.");
-      return;
-    }
-
-    const phoneRegex = /^(?:\+91[-\s]?)?[6-9]\d{9}$/;
-    if (!phoneRegex.test(passengerPhone.trim())) {
-      setValidationError("Please enter a valid 10-digit Indian mobile number.");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(passengerEmail.trim())) {
-      setValidationError("Please enter a valid email address.");
-      return;
-    }
-
-    setValidationError("");
     const newBookingId = `JNX-${Math.floor(Math.random() * 1000000)}`;
     const newBooking = {
       id: newBookingId,
@@ -144,47 +103,49 @@ function BookingFlow() {
       amount: selectedSeats.length * trip.price + selectedSeats.length * 50,
       seats: selectedSeats.join(", "),
       isDemo: true,
-      passengerName,
-      passengerAge,
-      gender,
-      passengerPhone,
-      passengerEmail
+      passengerName: "John Doe",
+      passengerAge: "28",
+      gender: "Male",
+      passengerPhone: "+919876543210",
+      passengerEmail: "john.doe@example.com"
     };
 
-    const existing = JSON.parse(localStorage.getItem("journyx_bookings") || "[]");
-    localStorage.setItem("journyx_bookings", JSON.stringify([newBooking, ...existing]));
-
-    setShowSuccessDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setShowSuccessDialog(false);
-    setSelectedSeats([]);
-    setPassengerName("");
-    setPassengerAge("");
-    setPassengerPhone("");
-    setPassengerEmail("");
-    setGender("Male");
+    try {
+      let existing = [];
+      const stored = localStorage.getItem("journyx_bookings");
+      if (stored) {
+        try {
+          existing = JSON.parse(stored);
+          if (!Array.isArray(existing)) existing = [];
+        } catch (parseErr) {
+          existing = [];
+        }
+      }
+      localStorage.setItem("journyx_bookings", JSON.stringify([newBooking, ...existing]));
+    } catch (err) {
+      console.error("Local storage error:", err);
+    }
 
     navigate({
-      to: "/my-bookings",
+      to: "/book/$tripId",
+      params: { tripId },
+      search: { step: "confirmation", bookingId: newBookingId },
     });
   };
 
-  const steps = ["Seats", "Booking"];
-  const stepIndex = step === "seats" ? 0 : step === "booking" ? 1 : 2;
+  const steps = ["Seats", "Confirmation"];
+  const stepIndex = step === "seats" ? 0 : 1;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
       
       {/* ── HEADER & STEPPER ────────────────────────────────────────────── */}
       {step !== "confirmation" && (
-        <header className="bg-white px-4 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 sticky top-0 z-40 shadow-[0_4px_20px_-10px_rgba(0,0,0,0.05)]">
+        <header className="bg-white px-4 pt-[calc(env(safe-area-inset-top)+1rem)] pb-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => {
                 if (step === "seats") navigate({ to: "/search", search: { from: "Chennai", to: "Bangalore", date: new Date().toISOString().split("T")[0], passengers: 1 } });
-                if (step === "booking") navigate({ from: Route.fullPath, search: { step: "seats" as BookingStep, bookingId: undefined } });
               }}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-700 active:scale-95 transition-all"
             >
@@ -235,7 +196,7 @@ function BookingFlow() {
       )}
 
       {/* ── MAIN CONTENT AREA ─────────────────────────────────────────── */}
-      <main className="flex-1 flex flex-col relative w-full max-w-xl mx-auto">
+      <div className="w-full max-w-xl mx-auto">
         
         {/* ── Step 1: Seat Selection ──────────────────────────────────── */}
         {step === "seats" && (
@@ -271,7 +232,7 @@ function BookingFlow() {
             </div>
             
             {/* Sticky Bottom Bar for Seats */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-50">
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-40">
                <div className="max-w-xl mx-auto flex items-center justify-between">
                  <div>
                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">
@@ -285,165 +246,16 @@ function BookingFlow() {
                    size="lg"
                    className="rounded-full px-8 shadow-lg active:scale-95 transition-all bg-teal-700 hover:bg-teal-800 text-white font-semibold"
                    disabled={selectedSeats.length === 0}
-                   onClick={proceedToBooking}
+                   onClick={completeBooking}
                  >
-                   Continue <ArrowRight className="ml-2 w-5 h-5" />
+                   Book Now <CheckCircle2 className="ml-2 w-5 h-5" />
                  </Button>
                </div>
             </div>
           </div>
         )}
 
-        {/* ── Step 2: Booking Details & Review ────────────────────────── */}
-        {step === "booking" && (
-          <div className="animate-in fade-in slide-in-from-right-4 duration-300 p-4 pb-40">
-            
-            <div className="bg-teal-50 border border-teal-100 rounded-2xl p-4 mb-6 flex items-start gap-4">
-              <div className="bg-teal-100 p-2 rounded-full text-teal-700 mt-1">
-                <Armchair className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-teal-900">Selected Seats</h3>
-                <p className="text-teal-700 font-medium text-lg mt-0.5">{selectedSeats.join(", ")}</p>
-              </div>
-            </div>
 
-            <form onSubmit={completeBooking} noValidate className="space-y-6 relative z-30">
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2">
-                  <UserCircle className="w-5 h-5 text-slate-400" /> Primary Passenger
-                </h3>
-                
-                <div className="space-y-5">
-                  <div>
-                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-1.5 block">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                      <Input
-                        value={passengerName}
-                        onChange={(e) => setPassengerName(e.target.value)}
-                        placeholder="Enter exactly as on ID"
-                        autoComplete="name"
-                        className="pl-12 h-14 bg-slate-50 border-slate-200 rounded-2xl text-[16px] focus-visible:ring-teal-600 focus-visible:ring-offset-0 scroll-mt-40"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-1.5 block">Age</Label>
-                      <div className="relative">
-                        <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                        <Input
-                          type="number"
-                          inputMode="numeric"
-                          value={passengerAge}
-                          onChange={(e) => setPassengerAge(e.target.value)}
-                          placeholder="Years"
-                          autoComplete="off"
-                          className="pl-12 h-14 bg-slate-50 border-slate-200 rounded-2xl text-[16px] focus-visible:ring-teal-600 focus-visible:ring-offset-0 scroll-mt-40"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-1.5 block">Gender</Label>
-                      <select
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        className="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl text-base px-4 appearance-none focus:outline-none focus:ring-2 focus:ring-teal-600 transition-shadow"
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
-                      >
-                        <option>Male</option>
-                        <option>Female</option>
-                        <option>Other</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-900 mb-5 flex items-center gap-2">
-                  <Mail className="w-5 h-5 text-slate-400" /> Contact Details
-                </h3>
-                <div className="space-y-5">
-                  <div>
-                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-1.5 block">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                      <Input
-                        type="tel"
-                        inputMode="tel"
-                        value={passengerPhone}
-                        onChange={(e) => setPassengerPhone(e.target.value)}
-                        placeholder="+91 Mobile Number"
-                        autoComplete="tel"
-                        className="pl-12 h-14 bg-slate-50 border-slate-200 rounded-2xl text-[16px] focus-visible:ring-teal-600 focus-visible:ring-offset-0 scroll-mt-40"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider ml-1 mb-1.5 block">Email Address</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                      <Input
-                        type="email"
-                        inputMode="email"
-                        value={passengerEmail}
-                        onChange={(e) => setPassengerEmail(e.target.value)}
-                        placeholder="Tickets will be sent here"
-                        autoComplete="email"
-                        className="pl-12 h-14 bg-slate-50 border-slate-200 rounded-2xl text-[16px] focus-visible:ring-teal-600 focus-visible:ring-offset-0 scroll-mt-40"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <ReceiptText className="w-5 h-5 text-slate-400" /> Fare Breakdown
-                </h3>
-                <div className="space-y-3 mb-4">
-                  <div className="flex justify-between text-slate-600">
-                    <span>Base Fare ({selectedSeats.length} × ₹{trip.price})</span>
-                    <span className="font-medium text-slate-900">₹{selectedSeats.length * trip.price}</span>
-                  </div>
-                  <div className="flex justify-between text-slate-600">
-                    <span>Taxes & Platform Fees</span>
-                    <span className="font-medium text-slate-900">₹{selectedSeats.length * 50}</span>
-                  </div>
-                </div>
-                <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                  <div>
-                    <p className="text-slate-500 text-sm font-medium">Amount Payable</p>
-                    <p className="text-2xl font-bold text-teal-700">₹{selectedSeats.length * trip.price + selectedSeats.length * 50}</p>
-                  </div>
-                </div>
-              </div>
-
-              {validationError && (
-                <div className="animate-in slide-in-from-bottom-2 bg-red-50 text-red-600 text-sm font-medium p-4 rounded-2xl border border-red-100 flex items-start gap-3">
-                  <ShieldCheck className="w-5 h-5 shrink-0" />
-                  <p>{validationError}</p>
-                </div>
-              )}
-
-              {/* Sticky Bottom Bar for Pay */}
-              <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-50">
-                 <div className="max-w-xl mx-auto flex gap-3">
-                   <Button
-                     type="submit"
-                     size="lg"
-                     className="h-14 flex-1 rounded-2xl shadow-lg active:scale-95 transition-all bg-teal-600 hover:bg-teal-700 text-white font-semibold flex items-center justify-center gap-2"
-                   >
-                     Confirm & Pay Securely <CreditCard className="w-5 h-5" />
-                   </Button>
-                 </div>
-              </div>
-            </form>
-          </div>
-        )}
 
         {/* ── Step 4: Confirmation ────────────────────────────────────── */}
         {step === "confirmation" && (
@@ -482,7 +294,7 @@ function BookingFlow() {
                </div>
                
                <div className="pt-4 mt-2">
-                 <p className="font-semibold text-slate-900">{passengerName}</p>
+                 <p className="font-semibold text-slate-900">John Doe</p>
                  <p className="text-sm text-slate-500">Seats: {selectedSeats.join(", ")}</p>
                </div>
             </div>
@@ -497,31 +309,7 @@ function BookingFlow() {
             </div>
           </div>
         )}
-      </main>
-
-      <AlertDialog open={showSuccessDialog} onOpenChange={handleCloseDialog}>
-        <AlertDialogContent className="rounded-3xl max-w-sm w-[90vw] mx-auto p-6 gap-6">
-          <div className="flex flex-col items-center text-center space-y-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-green-400/20 rounded-full animate-ping" />
-              <CheckCircle2 className="w-8 h-8 text-green-600 relative z-10" />
-            </div>
-            <div>
-              <AlertDialogTitle className="text-2xl font-bold font-display text-slate-900 mb-2">
-                Booking Confirmed!
-              </AlertDialogTitle>
-              <AlertDialogDescription className="text-slate-500">
-                Your ticket has been booked successfully and the details have been sent to your email.
-              </AlertDialogDescription>
-            </div>
-          </div>
-          <AlertDialogFooter className="sm:justify-center">
-            <AlertDialogAction onClick={handleCloseDialog} className="w-full h-14 rounded-full text-lg shadow-lg active:scale-95 transition-all bg-teal-600 hover:bg-teal-700 text-white font-semibold">
-              View in My Bookings
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      </div>
     </div>
   );
 }
