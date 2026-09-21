@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextType {
   user: string | null;
-  login: () => void;
+  login: (name?: string) => void;
   logout: () => void;
 }
 
@@ -11,7 +11,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<string | null>(null);
 
-  const login = () => setUser('Mock User');
+  const login = (name?: string) => setUser(name || 'Mock User');
   const logout = () => setUser(null);
 
   return (
