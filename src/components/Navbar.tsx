@@ -1,6 +1,6 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Bus } from "lucide-react";
+import { Bus, UserCircle } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export function Navbar() {
@@ -54,15 +54,22 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           {user ? (
             <>
-              <span className="hidden sm:inline-flex text-sm font-medium">Hello, {user}</span>
-              <Button onClick={logout} variant="outline">Sign Out</Button>
+              <Link to="/profile" className="flex items-center gap-2 hover:bg-slate-100 p-1.5 pr-3 rounded-full transition-colors border border-transparent hover:border-slate-200">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <UserCircle className="w-5 h-5" />
+                </div>
+                <span className="hidden sm:inline-flex text-sm font-medium">{user}</span>
+              </Link>
+              <Button onClick={logout} variant="outline" size="sm">Sign Out</Button>
             </>
           ) : (
             <>
-              <Button onClick={login} variant="ghost" className="hidden sm:inline-flex">
-                Log in
+              <Button variant="ghost" asChild className="hidden sm:inline-flex">
+                <Link to="/login">Log in</Link>
               </Button>
-              <Button onClick={login}>Sign Up</Button>
+              <Button asChild>
+                <Link to="/login">Sign Up</Link>
+              </Button>
             </>
           )}
         </div>
