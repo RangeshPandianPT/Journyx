@@ -16,7 +16,120 @@ export interface BusTrip {
   isLive: boolean; // false = DEMO DATA
 }
 
-export const generateMockTrips = (from: string, to: string, date: string): BusTrip[] => {
+export const generateMockTrips = (from: string, to: string, date: string, type: string = "bus"): BusTrip[] => {
+  if (type === "train") {
+    return [
+      {
+        id: "train-1",
+        operator: "Indian Railways",
+        departureTime: "06:00",
+        arrivalTime: "11:30",
+        duration: "5h 30m",
+        busType: "Vande Bharat Express",
+        isAC: true,
+        isSleeper: false,
+        price: 1540,
+        availableSeats: 45,
+        totalSeats: 300,
+        boardingPoints: [`${from} Central`],
+        droppingPoints: [`${to} City`],
+        rating: 4.8,
+        isLive: false,
+      },
+      {
+        id: "train-2",
+        operator: "Indian Railways",
+        departureTime: "22:15",
+        arrivalTime: "05:00",
+        duration: "6h 45m",
+        busType: "Shatabdi Express",
+        isAC: true,
+        isSleeper: true,
+        price: 980,
+        availableSeats: 12,
+        totalSeats: 150,
+        boardingPoints: [`${from} Egmore`],
+        droppingPoints: [`${to} Cantonment`],
+        rating: 4.5,
+        isLive: false,
+      },
+      {
+        id: "train-3",
+        operator: "Indian Railways",
+        departureTime: "23:30",
+        arrivalTime: "07:15",
+        duration: "7h 45m",
+        busType: "Mail/Express",
+        isAC: false,
+        isSleeper: true,
+        price: 450,
+        availableSeats: 120,
+        totalSeats: 500,
+        boardingPoints: [`${from} Central`],
+        droppingPoints: [`${to} Junction`],
+        rating: 3.9,
+        isLive: false,
+      },
+    ];
+  }
+
+  if (type === "flight") {
+    return [
+      {
+        id: "flight-1",
+        operator: "IndiGo",
+        departureTime: "08:15",
+        arrivalTime: "09:30",
+        duration: "1h 15m",
+        busType: "Economy",
+        isAC: true,
+        isSleeper: false,
+        price: 3200,
+        availableSeats: 15,
+        totalSeats: 180,
+        boardingPoints: [`${from} Airport`],
+        droppingPoints: [`${to} Airport`],
+        rating: 4.2,
+        isLive: false,
+      },
+      {
+        id: "flight-2",
+        operator: "Air India",
+        departureTime: "14:00",
+        arrivalTime: "15:20",
+        duration: "1h 20m",
+        busType: "Business",
+        isAC: true,
+        isSleeper: false,
+        price: 8500,
+        availableSeats: 4,
+        totalSeats: 20,
+        boardingPoints: [`${from} Airport`],
+        droppingPoints: [`${to} Airport`],
+        rating: 4.6,
+        isLive: false,
+      },
+      {
+        id: "flight-3",
+        operator: "SpiceJet",
+        departureTime: "20:45",
+        arrivalTime: "21:55",
+        duration: "1h 10m",
+        busType: "Economy",
+        isAC: true,
+        isSleeper: false,
+        price: 2900,
+        availableSeats: 42,
+        totalSeats: 189,
+        boardingPoints: [`${from} Airport`],
+        droppingPoints: [`${to} Airport`],
+        rating: 3.8,
+        isLive: false,
+      },
+    ];
+  }
+
+  // Default to Bus
   return [
     {
       id: "trip-1",
@@ -90,6 +203,15 @@ export const generateMockTrips = (from: string, to: string, date: string): BusTr
 };
 
 export const getTripById = (id: string) => {
-  const trips = generateMockTrips("Chennai", "Bangalore", new Date().toISOString());
-  return trips.find(t => t.id === id);
+  // Try finding in all types since we just use id
+  const from = "Chennai";
+  const to = "Bangalore";
+  const date = new Date().toISOString();
+  
+  const allTrips = [
+    ...generateMockTrips(from, to, date, "bus"),
+    ...generateMockTrips(from, to, date, "train"),
+    ...generateMockTrips(from, to, date, "flight")
+  ];
+  return allTrips.find(t => t.id === id);
 };
