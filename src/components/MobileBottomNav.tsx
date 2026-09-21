@@ -1,8 +1,10 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Search, Ticket, HelpCircle } from "lucide-react";
+import { Home, Search, Ticket, LogIn, LogOut } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export function MobileBottomNav() {
   const location = useLocation();
+  const { user, login, logout } = useAuth();
 
   const navItems = [
     {
@@ -24,12 +26,17 @@ export function MobileBottomNav() {
       icon: Ticket,
       isActive: location.pathname === "/my-bookings",
     },
-    {
-      label: "Help",
-      to: "/",
-      icon: HelpCircle,
+    user ? {
+      label: "Sign Out",
+      action: logout,
+      icon: LogOut,
       isActive: false,
-    },
+    } : {
+      label: "Sign In",
+      action: login,
+      icon: LogIn,
+      isActive: false,
+    }
   ];
 
   if (location.pathname.startsWith('/book')) {
@@ -39,13 +46,37 @@ export function MobileBottomNav() {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-background/95 backdrop-blur border-t border-border no-print safe-area-bottom">
       <nav className="flex items-center justify-around h-16 px-2">
-        {navItems.map((item) => {
+        {navItems.map((item, index) => {
           const Icon = item.icon;
           const active = item.isActive;
+          
+          if ('action' in item) {
+            return (
+              <button
+                key={item.label}
+                onClick={item.action}
+                className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-xs font-medium transition-colors ${
+                  active
+                    ? "text-primary font-semibold"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <div
+                  className={`p-1 rounded-full transition-transform ${
+                    active ? "scale-110 bg-primary/10" : ""
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <span className="mt-0.5">{item.label}</span>
+              </button>
+            )
+          }
+
           return (
             <Link
               key={item.label}
-              to={item.to}
+              to={item.to!}
               search={item.search}
               className={`flex flex-col items-center justify-center flex-1 h-full py-1 text-xs font-medium transition-colors ${
                 active

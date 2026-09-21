@@ -1,9 +1,12 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Bus } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export function Navbar() {
   const location = useLocation();
+  const { user, login, logout } = useAuth();
+  
   if (location.pathname.startsWith('/book')) {
     return null;
   }
@@ -49,10 +52,19 @@ export function Navbar() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" className="hidden sm:inline-flex">
-            Log in
-          </Button>
-          <Button>Sign Up</Button>
+          {user ? (
+            <>
+              <span className="hidden sm:inline-flex text-sm font-medium">Hello, {user}</span>
+              <Button onClick={logout} variant="outline">Sign Out</Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={login} variant="ghost" className="hidden sm:inline-flex">
+                Log in
+              </Button>
+              <Button onClick={login}>Sign Up</Button>
+            </>
+          )}
         </div>
       </div>
     </header>
