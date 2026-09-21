@@ -107,7 +107,7 @@ function BookingFlow() {
       passengerAge: "28",
       gender: "Male",
       passengerPhone: "+919876543210",
-      passengerEmail: "john.doe@example.com"
+      passengerEmail: "mugul@example.com"
     };
 
     try {

@@ -11,6 +11,8 @@ import {
   Clock,
   ShieldCheck,
   BusFront,
+  Train,
+  Plane,
   ArrowRight,
   SlidersHorizontal,
   X,
@@ -26,6 +28,7 @@ export const Route = createFileRoute("/search")({
       to: (search["to"] as string) || "Bangalore",
       date: (search["date"] as string) || new Date().toISOString().split("T")[0],
       passengers: Number(search["passengers"]) || 1,
+      type: (search["type"] as string) || "bus",
     };
   },
 });
@@ -36,7 +39,8 @@ function SearchResults() {
   const to: string = String(search["to"] ?? "Bangalore");
   const date: string = String(search["date"] ?? new Date().toISOString().split("T")[0]);
   const passengers: number = Number(search["passengers"] ?? 1);
-  const trips = generateMockTrips(from, to, date);
+  const type: string = String(search["type"] ?? "bus");
+  const trips = generateMockTrips(from, to, date, type);
   const navigate = useNavigate();
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [sortBy, setSortBy] = useState("recommended");
@@ -100,7 +104,7 @@ function SearchResults() {
               Clear All
             </button>
           </div>
-          <FilterPanel />
+          <FilterPanel type={type} />
         </aside>
 
         {/* ── Mobile Filter Sheet ──────────────────────────── */}
@@ -122,7 +126,7 @@ function SearchResults() {
                   <X className="h-5 w-5" />
                 </button>
               </div>
-              <FilterPanel />
+              <FilterPanel type={type} />
               <Button
                 className="w-full mt-6"
                 onClick={() => setShowMobileFilters(false)}
@@ -138,7 +142,7 @@ function SearchResults() {
           {/* Results header */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <h2 className="text-lg font-bold">
-              {sortedTrips.length} Buses Found
+              {sortedTrips.length} {type === "train" ? "Trains" : type === "flight" ? "Flights" : "Buses"} Found
             </h2>
             <div className="flex items-center gap-3">
               {/* Mobile filter toggle */}
@@ -178,9 +182,8 @@ function SearchResults() {
                       <div>
                         <h3 className="font-bold text-base">{trip.operator}</h3>
                         <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
-                          <BusFront className="h-3.5 w-3.5" />
-                          {trip.busType} • {trip.isAC ? "A/C" : "Non A/C"}{" "}
-                          {trip.isSleeper ? "Sleeper" : "Seater"}
+                          {type === "train" ? <Train className="h-3.5 w-3.5" /> : type === "flight" ? <Plane className="h-3.5 w-3.5" /> : <BusFront className="h-3.5 w-3.5" />}
+                          {trip.busType} {type === "flight" ? "" : `• ${trip.isAC ? "A/C" : "Non A/C"} ${trip.isSleeper ? "Sleeper" : "Seater"}`}
                         </p>
                       </div>
                       {!trip.isLive && (
@@ -263,13 +266,13 @@ function SearchResults() {
   );
 }
 
-function FilterPanel() {
+function FilterPanel({ type }: { type: string }) {
   return (
     <Card className="border-border shadow-soft rounded-xl bg-card overflow-hidden">
       <CardContent className="p-5 space-y-6">
         <div className="space-y-3">
           <h3 className="font-semibold text-xs uppercase tracking-wider text-muted-foreground">
-            Bus Type
+            {type === "train" ? "Train Type" : type === "flight" ? "Cabin Class" : "Bus Type"}
           </h3>
           <div className="space-y-2.5">
             {[

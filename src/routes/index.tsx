@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/")(({
   component: Index,
@@ -112,7 +113,7 @@ function Index() {
     if (!from || !to || !date) return;
     navigate({
       to: "/search",
-      search: { from, to, date, passengers: Number(passengers) },
+      search: { from, to, date, passengers: Number(passengers), type: activeTab },
     });
   };
 
@@ -146,150 +147,229 @@ function Index() {
 
             {/* Search Module */}
             <div className="w-full max-w-5xl mt-8">
-              {/* Tab Selector — using plain buttons instead of Radix Tabs
-                  to avoid Tabs context issues in Capacitor WebView */}
-              <div className="flex justify-center mb-6">
-                <div className="flex gap-1 p-1 bg-surface-muted border border-border shadow-soft rounded-xl w-full max-w-md">
-                  {tabs.map(({ value, label, icon: Icon }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setActiveTab(value)}
-                      className={cn(
-                        "flex-1 flex items-center justify-center gap-2 h-12 rounded-lg font-medium text-sm transition-all",
-                        activeTab === value
-                          ? "bg-primary text-primary-foreground shadow-md"
-                          : "text-muted-foreground hover:text-foreground"
-                      )}
+              {/* Animated Vehicle Hero */}
+              <div className="flex justify-center h-32 items-center overflow-hidden mb-4 relative">
+                <AnimatePresence mode="wait">
+                  {activeTab === "bus" && (
+                    <motion.div
+                      key="bus"
+                      initial={{ x: -100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 100, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                      className="text-primary flex flex-col items-center"
                     >
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline">{label}</span>
-                    </button>
-                  ))}
+                      <Bus className="w-20 h-20 sm:w-24 sm:h-24" />
+                      <motion.div 
+                        className="h-1.5 w-32 bg-primary/20 rounded-full mt-2" 
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ delay: 0.2, duration: 0.5 }}
+                      />
+                    </motion.div>
+                  )}
+                  {activeTab === "train" && (
+                    <motion.div
+                      key="train"
+                      initial={{ x: -100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: 100, opacity: 0 }}
+                      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                      className="text-primary flex flex-col items-center"
+                    >
+                      <Train className="w-20 h-20 sm:w-24 sm:h-24" />
+                      <div className="flex gap-1 mt-2">
+                        {[...Array(5)].map((_, i) => (
+                          <motion.div 
+                            key={i}
+                            className="h-1.5 w-6 bg-primary/20 rounded-full" 
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ delay: i * 0.1, duration: 0.3 }}
+                          />
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                  {activeTab === "flight" && (
+                    <motion.div
+                      key="flight"
+                      initial={{ y: 50, scale: 0.8, opacity: 0, rotate: -15 }}
+                      animate={{ y: 0, scale: 1, opacity: 1, rotate: 0 }}
+                      exit={{ y: -50, scale: 0.8, opacity: 0, rotate: 15 }}
+                      transition={{ type: "spring", stiffness: 100, damping: 15 }}
+                      className="text-primary flex flex-col items-center"
+                    >
+                      <Plane className="w-20 h-20 sm:w-24 sm:h-24" />
+                      <motion.div 
+                        className="h-1.5 w-24 bg-primary/20 rounded-full mt-2" 
+                        initial={{ opacity: 0, scale: 0.5 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2, duration: 0.4 }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Tab Selector — using plain buttons with framer-motion enhancements */}
+              <div className="flex justify-center mb-6">
+                <div className="flex gap-1 p-1 bg-surface-muted border border-border shadow-soft rounded-xl w-full max-w-md relative">
+                  {tabs.map(({ value, label, icon: Icon }) => {
+                    const isActive = activeTab === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setActiveTab(value)}
+                        className={cn(
+                          "relative z-10 flex-1 flex items-center justify-center gap-2 h-12 rounded-lg font-medium text-sm transition-all duration-300",
+                          isActive
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        )}
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeTab"
+                            className="absolute inset-0 bg-primary rounded-lg shadow-md -z-10"
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                          />
+                        )}
+                        <AnimatePresence mode="popLayout">
+                          {isActive ? (
+                            <motion.div
+                              key="icon-active"
+                              initial={{ scale: 0.5, opacity: 0, rotate: -15 }}
+                              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                              exit={{ scale: 0.5, opacity: 0, rotate: 15 }}
+                              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            >
+                              <Icon className="h-4 w-4" />
+                            </motion.div>
+                          ) : (
+                            <Icon className="h-4 w-4" />
+                          )}
+                        </AnimatePresence>
+                        <span className="hidden sm:inline">{label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              {activeTab === "bus" ? (
-                <Card className="border-border shadow-raise overflow-hidden bg-card rounded-2xl">
-                  <CardContent className="p-3 sm:p-4">
-                    <form
-                      onSubmit={handleSearch}
-                      className="flex flex-col lg:flex-row items-stretch gap-2"
-                    >
-                      {/* From & To with Swap */}
-                      <div className="flex flex-col sm:flex-row w-full lg:w-2/5 gap-2 relative">
-                        <NativeSelect
-                          name="from"
-                          value={from}
-                          onChange={setFrom}
-                          placeholder="From"
-                          icon={MapPin}
-                          options={CITIES}
-                        />
+              <Card className="border-border shadow-raise overflow-hidden bg-card rounded-2xl">
+                <CardContent className="p-3 sm:p-4">
+                  <form
+                    onSubmit={handleSearch}
+                    className="flex flex-col lg:flex-row items-stretch gap-2"
+                  >
+                    {/* From & To with Swap */}
+                    <div className="flex flex-col sm:flex-row w-full lg:w-2/5 gap-2 relative">
+                      <NativeSelect
+                        name="from"
+                        value={from}
+                        onChange={setFrom}
+                        placeholder="From"
+                        icon={MapPin}
+                        options={CITIES}
+                      />
 
-                        {/* Swap Button — desktop (absolute center) */}
-                        <button
-                          type="button"
-                          onClick={swapCities}
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden sm:flex h-8 w-8 items-center justify-center rounded-full bg-card border border-border shadow-sm hover:bg-surface-muted active:scale-95 transition-all cursor-pointer text-primary"
-                          title="Swap cities"
-                        >
-                          <ArrowRightLeft className="h-4 w-4" />
-                        </button>
-
-                        <NativeSelect
-                          name="to"
-                          value={to}
-                          onChange={setTo}
-                          placeholder="To"
-                          icon={MapPin}
-                          options={CITIES}
-                        />
-                      </div>
-
-                      {/* Swap Button — mobile only */}
+                      {/* Swap Button — desktop (absolute center) */}
                       <button
                         type="button"
                         onClick={swapCities}
-                        className="sm:hidden self-center flex h-9 items-center gap-2 px-4 py-2 rounded-lg border border-border bg-surface-muted hover:bg-surface text-sm font-medium text-muted-foreground active:scale-95 transition-all"
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 hidden sm:flex h-8 w-8 items-center justify-center rounded-full bg-card border border-border shadow-sm hover:bg-surface-muted active:scale-95 transition-all cursor-pointer text-primary"
+                        title="Swap cities"
                       >
                         <ArrowRightLeft className="h-4 w-4" />
-                        Swap
                       </button>
 
-                      {/* Date — using native <input type="date"> instead of
-                          Radix Popover+Calendar. Radix Popover uses a Portal which
-                          captures pointer events in Capacitor WebView and never
-                          releases them, freezing the entire UI. */}
-                      <div className="relative w-full lg:w-1/4">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none">
-                          <CalendarIcon className="h-5 w-5" />
-                        </div>
-                        <input
-                          type="date"
-                          name="date"
-                          value={date}
-                          min={todayStr()}
-                          onChange={(e) => setDate(e.target.value)}
-                          required
-                          className={cn(
-                            "h-16 w-full pl-12 pr-4 rounded-xl border border-border",
-                            "bg-surface-muted hover:bg-surface focus:bg-surface",
-                            "transition-colors text-base font-medium shadow-none",
-                            "outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                            "cursor-pointer [color-scheme:light]"
-                          )}
-                        />
-                      </div>
+                      <NativeSelect
+                        name="to"
+                        value={to}
+                        onChange={setTo}
+                        placeholder="To"
+                        icon={MapPin}
+                        options={CITIES}
+                      />
+                    </div>
 
-                      {/* Passengers */}
-                      <div className="relative w-full lg:w-[170px]">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
-                          <User className="h-5 w-5" />
-                        </div>
-                        <select
-                          name="passengers"
-                          value={passengers}
-                          onChange={(e) => setPassengers(e.target.value)}
-                          className={cn(
-                            "h-16 w-full pl-12 pr-4 rounded-xl border border-border",
-                            "bg-surface-muted hover:bg-surface focus:bg-surface",
-                            "transition-colors text-base font-medium shadow-none",
-                            "appearance-none outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                            "cursor-pointer"
-                          )}
-                        >
-                          <option value="1">1 Passenger</option>
-                          <option value="2">2 Passengers</option>
-                          <option value="3">3 Passengers</option>
-                          <option value="4">4 Passengers</option>
-                          <option value="5">5 Passengers</option>
-                          <option value="6">6+ Passengers</option>
-                        </select>
-                      </div>
+                    {/* Swap Button — mobile only */}
+                    <button
+                      type="button"
+                      onClick={swapCities}
+                      className="sm:hidden self-center flex h-9 items-center gap-2 px-4 py-2 rounded-lg border border-border bg-surface-muted hover:bg-surface text-sm font-medium text-muted-foreground active:scale-95 transition-all"
+                    >
+                      <ArrowRightLeft className="h-4 w-4" />
+                      Swap
+                    </button>
 
-                      {/* Search Button */}
-                      <div className="w-full lg:w-auto lg:ml-2">
-                        <Button
-                          type="submit"
-                          disabled={!from || !to || !date}
-                          className="w-full lg:w-[140px] h-16 rounded-xl text-lg shadow-md font-semibold gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
-                        >
-                          <Search className="h-5 w-5" />
-                          <span>Search</span>
-                        </Button>
+                    {/* Date — using native <input type="date"> instead of
+                        Radix Popover+Calendar. Radix Popover uses a Portal which
+                        captures pointer events in Capacitor WebView and never
+                        releases them, freezing the entire UI. */}
+                    <div className="relative w-full lg:w-1/4">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none">
+                        <CalendarIcon className="h-5 w-5" />
                       </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              ) : (
-                <Card className="border-border shadow-raise overflow-hidden bg-card rounded-2xl h-[100px] flex items-center justify-center">
-                  <p className="text-muted-foreground font-medium">
-                    {activeTab === "train" ? "Train" : "Aeroplane"} search
-                    coming soon...
-                  </p>
-                </Card>
-              )}
+                      <input
+                        type="date"
+                        name="date"
+                        value={date}
+                        min={todayStr()}
+                        onChange={(e) => setDate(e.target.value)}
+                        required
+                        className={cn(
+                          "h-16 w-full pl-12 pr-4 rounded-xl border border-border",
+                          "bg-surface-muted hover:bg-surface focus:bg-surface",
+                          "transition-colors text-base font-medium shadow-none",
+                          "outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          "cursor-pointer [color-scheme:light]"
+                        )}
+                      />
+                    </div>
+
+                    {/* Passengers */}
+                    <div className="relative w-full lg:w-[170px]">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                        <User className="h-5 w-5" />
+                      </div>
+                      <select
+                        name="passengers"
+                        value={passengers}
+                        onChange={(e) => setPassengers(e.target.value)}
+                        className={cn(
+                          "h-16 w-full pl-12 pr-4 rounded-xl border border-border",
+                          "bg-surface-muted hover:bg-surface focus:bg-surface",
+                          "transition-colors text-base font-medium shadow-none",
+                          "appearance-none outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                          "cursor-pointer"
+                        )}
+                      >
+                        <option value="1">1 Passenger</option>
+                        <option value="2">2 Passengers</option>
+                        <option value="3">3 Passengers</option>
+                        <option value="4">4 Passengers</option>
+                        <option value="5">5 Passengers</option>
+                        <option value="6">6+ Passengers</option>
+                      </select>
+                    </div>
+
+                    {/* Search Button */}
+                    <div className="w-full lg:w-auto lg:ml-2">
+                      <Button
+                        type="submit"
+                        disabled={!from || !to || !date}
+                        className="w-full lg:w-[140px] h-16 rounded-xl text-lg shadow-md font-semibold gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                      >
+                        <Search className="h-5 w-5" />
+                        <span>Search</span>
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
 
               {/* Quick Suggestions */}
               <div className="mt-10 flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
