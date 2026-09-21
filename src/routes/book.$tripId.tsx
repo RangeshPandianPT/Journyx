@@ -52,6 +52,7 @@ function BookingFlow() {
   const trip = getTripById(tripId);
 
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  const [passengerName, setPassengerName] = useState("");
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -103,11 +104,11 @@ function BookingFlow() {
       amount: selectedSeats.length * trip.price + selectedSeats.length * 50,
       seats: selectedSeats.join(", "),
       isDemo: true,
-      passengerName: "John Doe",
+      passengerName: passengerName || "Guest",
       passengerAge: "28",
       gender: "Male",
       passengerPhone: "+919876543210",
-      passengerEmail: "john.doe@example.com"
+      passengerEmail: "guest@example.com"
     };
 
     try {
@@ -133,8 +134,8 @@ function BookingFlow() {
     });
   };
 
-  const steps = ["Seats", "Confirmation"];
-  const stepIndex = step === "seats" ? 0 : 1;
+  const steps = ["Seats", "Details", "Done"];
+  const stepIndex = step === "seats" ? 0 : step === "booking" ? 1 : 2;
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
@@ -146,6 +147,7 @@ function BookingFlow() {
             <button
               onClick={() => {
                 if (step === "seats") navigate({ to: "/search", search: { from: "Chennai", to: "Bangalore", date: new Date().toISOString().split("T")[0], passengers: 1 } });
+                else if (step === "booking") navigate({ to: "/book/$tripId", params: { tripId }, search: { step: "seats" } });
               }}
               className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-700 active:scale-95 transition-all"
             >
@@ -246,6 +248,54 @@ function BookingFlow() {
                    size="lg"
                    className="rounded-full px-8 shadow-lg active:scale-95 transition-all bg-teal-700 hover:bg-teal-800 text-white font-semibold"
                    disabled={selectedSeats.length === 0}
+                   onClick={() => navigate({ to: "/book/$tripId", params: { tripId }, search: { step: "booking" } })}
+                 >
+                   Continue <ArrowRight className="ml-2 w-5 h-5" />
+                 </Button>
+               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Step 2: Passenger Details ──────────────────────────────── */}
+        {step === "booking" && (
+          <div className="animate-in fade-in slide-in-from-right-4 duration-300 p-4 pb-32">
+            <h2 className="text-xl font-bold text-slate-800 mb-6">Passenger Details</h2>
+            
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+              <div className="space-y-6">
+                <div>
+                  <Label htmlFor="passengerName" className="text-slate-600 mb-2 block font-medium">Full Name</Label>
+                  <div className="relative">
+                    <UserCircle className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-400" />
+                    <input
+                      id="passengerName"
+                      type="text"
+                      className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all text-lg"
+                      placeholder="Enter your name"
+                      value={passengerName}
+                      onChange={(e) => setPassengerName(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sticky Bottom Bar for Booking */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-40">
+               <div className="max-w-xl mx-auto flex items-center justify-between">
+                 <div>
+                   <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">
+                     Total Amount
+                   </p>
+                   <p className="text-xl font-bold text-slate-900">
+                     ₹{selectedSeats.length * trip.price + selectedSeats.length * 50}
+                   </p>
+                 </div>
+                 <Button
+                   size="lg"
+                   className="rounded-full px-8 shadow-lg active:scale-95 transition-all bg-teal-700 hover:bg-teal-800 text-white font-semibold"
+                   disabled={!passengerName.trim()}
                    onClick={completeBooking}
                  >
                    Book Now <CheckCircle2 className="ml-2 w-5 h-5" />
@@ -254,10 +304,6 @@ function BookingFlow() {
             </div>
           </div>
         )}
-
-
-
-        {/* ── Step 4: Confirmation ────────────────────────────────────── */}
         {step === "confirmation" && (
           <div className="animate-in zoom-in-95 fade-in duration-500 p-6 pt-12 flex flex-col items-center text-center">
             <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 relative">
@@ -294,7 +340,7 @@ function BookingFlow() {
                </div>
                
                <div className="pt-4 mt-2">
-                 <p className="font-semibold text-slate-900">John Doe</p>
+                 <p className="font-semibold text-slate-900">{passengerName || "Guest"}</p>
                  <p className="text-sm text-slate-500">Seats: {selectedSeats.join(", ")}</p>
                </div>
             </div>
