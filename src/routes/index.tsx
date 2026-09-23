@@ -134,16 +134,51 @@ function Index() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative pt-20 pb-32 overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/5 via-background to-background" />
+          {/* Animated Background */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute inset-0 bg-background" />
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -top-[20%] -left-[10%] w-[50%] h-[60%] rounded-full bg-primary/10 blur-[100px]"
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="absolute top-[10%] -right-[10%] w-[40%] h-[50%] rounded-full bg-teal-500/10 blur-[100px]"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,var(--background)_100%)]" />
+          </div>
 
-          <div className="container-page flex flex-col items-center text-center space-y-6">
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-3xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="container-page flex flex-col items-center text-center space-y-6"
+          >
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+              className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground max-w-3xl"
+            >
               Where are you going?
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl font-light">
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+              className="text-lg md:text-xl text-muted-foreground max-w-2xl font-light"
+            >
               Find the right transport, choose your seat, and book your journey
               in minutes.
-            </p>
+            </motion.p>
 
             {/* Search Module */}
             <div className="w-full max-w-5xl mt-8">
@@ -258,9 +293,15 @@ function Index() {
                 </div>
               </div>
 
-              <Card className="border-border shadow-raise overflow-hidden bg-card rounded-2xl">
-                <CardContent className="p-3 sm:p-4">
-                  <form
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+                className="w-full"
+              >
+                <Card className="border-border/50 shadow-raise overflow-hidden bg-white/80 backdrop-blur-xl rounded-3xl ring-1 ring-black/5">
+                  <CardContent className="p-4 sm:p-5">
+                    <form
                     onSubmit={handleSearch}
                     className="flex flex-col lg:flex-row items-stretch gap-2"
                   >
@@ -370,6 +411,7 @@ function Index() {
                   </form>
                 </CardContent>
               </Card>
+              </motion.div>
 
               {/* Quick Suggestions */}
               <div className="mt-10 flex flex-col items-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150 fill-mode-both">
@@ -378,21 +420,26 @@ function Index() {
                 </h3>
                 <div className="flex flex-wrap justify-center gap-3">
                   {quickSuggestions.map((route, i) => (
-                    <button
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: 0.5 + i * 0.05 }}
+                      whileHover={{ scale: 1.05, borderColor: "var(--color-primary)" }}
+                      whileTap={{ scale: 0.95 }}
                       key={i}
                       type="button"
                       onClick={() => fillQuickSuggestion(route)}
-                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-card hover:border-primary hover:bg-surface active:scale-95 transition-all text-sm font-medium shadow-sm group"
+                      className="flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-white/80 backdrop-blur-md hover:bg-white transition-colors text-sm font-medium shadow-sm group hover:shadow-md"
                     >
                       <span>{route.from}</span>
                       <ArrowRight className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
                       <span>{route.to}</span>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* Feature Section */}
