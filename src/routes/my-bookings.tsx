@@ -142,20 +142,7 @@ function BookingCard({ booking }: { booking: any }) {
             </div>
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col justify-center gap-2 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-6">
-            <Button variant="outline" className="w-full justify-start gap-2">
-              <Eye className="h-4 w-4" /> View Ticket
-            </Button>
-            <Button variant="outline" className="w-full justify-start gap-2">
-              <Download className="h-4 w-4" /> Download
-            </Button>
-            {booking.status === "Upcoming" && (
-              <Button variant="ghost" className="w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/10">
-                <XCircle className="h-4 w-4" /> Cancel Booking
-              </Button>
-            )}
-          </div>
+
           
         </div>
       </CardContent>
